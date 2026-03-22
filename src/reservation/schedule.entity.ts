@@ -1,12 +1,10 @@
 import {
     Entity,
-    OneToMany,
-    JoinColumn,
     Column,
     PrimaryGeneratedColumn,
   } from 'typeorm';
-  Entity('Days');
-  export class AvlDays {
+  Entity('schedule');
+  export class docschedule {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
   
@@ -23,10 +21,6 @@ import {
     endTime!: string;
 
     @Column()
-    daystatus!: boolean;
+    status!:boolean;
     
-    @OneToMany(() => Hours, (hours) => hours.avlDays)
-    @JoinColumn({ name: 'hourId' })
-    hours!: Hours[];
-
   }

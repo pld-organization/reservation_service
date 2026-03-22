@@ -5,24 +5,18 @@ import {
     Column,
     PrimaryGeneratedColumn,
   } from 'typeorm';
-  import {Days} from './days.entity';
-  import {Hours} from './hours.entity';
+  import {docschedule} from './schedule.entity';
+  
   @Entity('reservation')
   export class Reservation {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
   
     @Column()
-    doctorId!: string;
-  
-    @Column()
     patientId!: string;
   
     @Column()
-    reservationDate!: Date;
-
-    @Column()
-    reservationTime!: string;
+    doctorId!: string;
 
     @Column({ nullable: true })
     reason!: string;
@@ -31,7 +25,8 @@ import {
     reservationStatus!: boolean;
 
     @Column()
-    
+    schefule!: docschedule
+
     @OneToOne(() => Days, (days) => days.id)
     @JoinColumn({ name: 'dayId' })
     day!: Days;
