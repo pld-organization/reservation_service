@@ -24,12 +24,12 @@ import {
     async Docsched(@Body('did') doctorId: string) {
         return this.reservationservice.getReservationsByDoctor(doctorId);
       }
-    @Get('patientschedule')
+    @Get('checkschedule')
+    @Get('docschedule')
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('jwt'))
-    async patientsched(@Body('did') doctorId: string){
-        return this.reservationservice.getReservationsByDoctor
+    async avbsched(@Body('did') doctorId: string){
+        return this.reservationservice.getAvailableHours(doctorId);
     }
-
 
   }

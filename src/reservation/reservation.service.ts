@@ -45,12 +45,14 @@ export class ReservationService {
   async getReservationsByPatient(patientId: string): Promise<Reservation[]> {
     return this.reservationRepository.find({ where: { patientId , reservationStatus: true} });
   }
+  async 
+
+  
 
 
-
-  async getAvailableHours(doctorId: string, dayOfWeek: string): Promise<docschedule[]> {
+  async getAvailableHours(doctorId: string): Promise<docschedule[]> {
     return this.scheduleRepository.find({
-      where: { doctorId, dayOfWeek, hourstatus: true },
+      where: { doctorId, status: true },
     });
   }
 }   

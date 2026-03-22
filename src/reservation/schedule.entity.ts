@@ -3,6 +3,7 @@ import {
     Column,
     PrimaryGeneratedColumn,
   } from 'typeorm';
+  import {TYPE} from '../common/type.enum'
   Entity('schedule');
   export class docschedule {
     @PrimaryGeneratedColumn('uuid')
@@ -21,6 +22,10 @@ import {
     endTime!: string;
 
     @Column()
+    appointmenttype: TYPE;
+
+    @Column()
     status!:boolean;
+    
     
   }
