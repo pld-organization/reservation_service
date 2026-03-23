@@ -4,6 +4,7 @@ import {
     PrimaryGeneratedColumn,
   } from 'typeorm';
   import {TYPE} from '../common/type.enum'
+  import {DAY} from '../common/days.enum'
   Entity('schedule');
   export class docschedule {
     @PrimaryGeneratedColumn('uuid')
@@ -13,7 +14,7 @@ import {
     doctorId!: string;
   
     @Column()
-    dayOfWeek!: string;
+    dayOfWeek!: DAY;
   
     @Column()
     startTime!: string;
