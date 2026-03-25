@@ -27,12 +27,4 @@ import {
     @Column()
     schefule!: docschedule
 
-    @OneToOne(() => Days, (days) => days.id)
-    @JoinColumn({ name: 'dayId' })
-    day!: Days;
-
-    @OneToOne(() => Hours, (hours) => hours.id)
-    @JoinColumn({ name: 'hourId' })
-    hour!: Hours;
-
   }

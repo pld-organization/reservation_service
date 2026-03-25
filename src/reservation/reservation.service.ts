@@ -1,8 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable , BadRequestException ,NotFoundException} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Reservation } from "./reservation.entity";
 import { docschedule } from "./schedule.entity";
+import { DAY } from "src/common/days.enum";
+import { TYPE } from "src/common/type.enum";
 
 @Injectable()
 export class ReservationService {
@@ -14,27 +16,53 @@ export class ReservationService {
   
   ) {}
 
-  async createReservation(data:{   
+ 
+  async createReservation(data: {
     doctorId: string;
     patientId: string;
-    reservationDate: Date;
+    reservationDay: DAY;
     reservationTime: string;
     reason: string;
     reservationStatus: boolean;
   }): Promise<Reservation> {
-    const reservation = this.reservationRepository.create(data);
+    const schedule = await this.scheduleRepository.findOne({ 
+      where: { 
+        doctorId: data.doctorId, 
+        dayOfWeek: data.reservationDay,       
+        startTime: data.reservationTime 
+      } 
+    });
+  
+    if (!schedule) {
+      throw new NotFoundException('No schedule slot found for this doctor/day/time');
+    }
+    if (schedule.status == 0) {
+      throw new BadRequestException('This time slot is already taken');
+    }
+    schedule.status = false; 
+    await this.scheduleRepository.save(schedule);
+  
+    const reservation = this.reservationRepository.create({
+      ...data,
+      schedule: schedule,       
+    });
+  
     return this.reservationRepository.save(reservation);
   }
 
 
   async create_work_timeline(data:{
   doctorId: string;
-  dayOfWeek: string;
+  dayOfWeek: DAY;
   starttime: string;
   endtime: string;
-
+  appointmenttype: TYPE;
   }): Promise<docschedule>{
-    const schedule = this.scheduleRepository.create(data);
+
+    const schedule = this.scheduleRepository.create({
+    ...data,
+    status: true,
+    });
     return this.scheduleRepository.save(schedule); 
   }
 
@@ -45,7 +73,7 @@ export class ReservationService {
   async getReservationsByPatient(patientId: string): Promise<Reservation[]> {
     return this.reservationRepository.find({ where: { patientId , reservationStatus: true} });
   }
-  async 
+  
 
   
 
@@ -55,4 +83,9 @@ export class ReservationService {
       where: { doctorId, status: true },
     });
   }
+
+  async cancelReservation(reservationId: string): Promise<void> {
+    await this.reservationRepository.update(reservationId, { reservationStatus: false });
+  }
+  
 }   
