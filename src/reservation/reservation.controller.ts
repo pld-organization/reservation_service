@@ -32,4 +32,6 @@ import {
         return this.reservationservice.getAvailableHours(doctorId);
     }
 
+    
+
   }

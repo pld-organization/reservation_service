@@ -1,30 +1,30 @@
 import {
-    Entity,
-    OneToOne,
-    JoinColumn,
-    Column,
-    PrimaryGeneratedColumn,
-  } from 'typeorm';
-  import {docschedule} from './schedule.entity';
-  
-  @Entity('reservation')
-  export class Reservation {
-    @PrimaryGeneratedColumn('uuid')
-    id!: string;
-  
-    @Column()
-    patientId!: string;
-  
-    @Column()
-    doctorId!: string;
+  Entity,
+  OneToOne,
+  JoinColumn,
+  Column,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { docschedule } from './schedule.entity';
 
-    @Column({ nullable: true })
-    reason!: string;
-    
-    @Column()
-    reservationStatus!: boolean;
+@Entity('reservation')
+export class Reservation {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-    @Column()
-    schefule!: docschedule
+  @Column()
+  patientId!: string;
 
-  }
+  @Column()
+  doctorId!: string;
+
+  @Column({ nullable: true })
+  reason!: string;
+
+  @Column({ default: false })
+  reservationStatus!: boolean;
+
+  @OneToOne(() => docschedule)
+  @JoinColumn()                 
+  schedule!: docschedule;
+}

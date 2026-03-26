@@ -1,32 +1,31 @@
 import {
-    Entity,
-    Column,
-    PrimaryGeneratedColumn,
-  } from 'typeorm';
-  import {TYPE} from '../common/type.enum'
-  import {DAY} from '../common/days.enum'
-  Entity('schedule');
-  export class docschedule {
-    @PrimaryGeneratedColumn('uuid')
-    id!: string;
-  
-    @Column()
-    doctorId!: string;
-  
-    @Column()
-    dayOfWeek!: DAY;
-  
-    @Column()
-    startTime!: string;
-  
-    @Column()
-    endTime!: string;
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { TYPE } from '../common/type.enum';
+import { DAY } from '../common/days.enum';
 
-    @Column()
-    appointmenttype: TYPE;
+@Entity('schedule')  // you had Entity(...) without the @
+export class docschedule {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-    @Column()
-    status!:boolean;
-    
-    
-  }
+  @Column()
+  doctorId!: string;
+
+  @Column({ type: 'enum', enum: DAY })
+  dayOfWeek!: DAY;
+
+  @Column()
+  startTime!: string;
+
+  @Column()
+  endTime!: string;
+
+  @Column({ type: 'enum', enum: TYPE })
+  appointmenttype!: TYPE;
+
+  @Column({ default: true })
+  status!: boolean;
+}
