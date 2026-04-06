@@ -1,13 +1,21 @@
+// app.module.ts
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CatsController } from './cat/cat.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { reservation } from './reservation/reservation.controller';
+import { ReservationModule } from './reservation/reservation.module'; // ✅ now exists
 
 @Module({
-  imports: [],
-  controllers: [AppController, CatsController, reservation],
-  providers: [AppService],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'Itachi12',
+      database: 'reservation_db',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'], // ✅ must include schedule.entity.ts
+      synchronize: true,
+    }),
+    ReservationModule, // ✅ import your module
+  ],
 })
 export class AppModule {}

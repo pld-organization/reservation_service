@@ -36,7 +36,7 @@ export class ReservationService {
     if (!schedule) {
       throw new NotFoundException('No schedule slot found for this doctor/day/time');
     }
-    if (schedule.status == 0) {
+    if (schedule.status == false) {
       throw new BadRequestException('This time slot is already taken');
     }
     schedule.status = false; 

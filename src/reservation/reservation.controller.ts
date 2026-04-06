@@ -1,37 +1,31 @@
+// reservation.controller.ts
 import {
-    Controller,
-    Post,
-    Get,
-    Body,
-    Req,
-    Res,
-    UseGuards,
-    HttpCode,
-    HttpStatus,
-    Query,
-  } from '@nestjs/common';
-  import { AuthGuard } from '@nestjs/passport';
-  import type { Request, Response } from 'express';
-  import { ReservationService} from './reservation.service'
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ReservationService } from './reservation.service';
 
-  @Controller('reservation')
-  export class reservation{
-    constructor(private readonly reservationservice: ReservationService) {}
- 
-    @Get('docschedule')
-    @HttpCode(HttpStatus.OK)
-    @UseGuards(AuthGuard('jwt'))
-    async Docsched(@Body('did') doctorId: string) {
-        return this.reservationservice.getReservationsByDoctor(doctorId);
-      }
-    @Get('checkschedule')
-    @Get('docschedule')
-    @HttpCode(HttpStatus.OK)
-    @UseGuards(AuthGuard('jwt'))
-    async avbsched(@Body('did') doctorId: string){
-        return this.reservationservice.getAvailableHours(doctorId);
-    }
+@Controller('reservation')
+export class ReservationController { // ✅ class name fixed
+  constructor(private readonly reservationService: ReservationService) {} // ✅ match casing
 
-    
-
+  @Get('docschedule')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  async docsched(@Body('did') doctorId: string) {
+    return this.reservationService.getReservationsByDoctor(doctorId);
   }
+
+  @Get('checkschedule')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  async avbsched(@Body('did') doctorId: string) {
+    return this.reservationService.getAvailableHours(doctorId);
+  }
+}
