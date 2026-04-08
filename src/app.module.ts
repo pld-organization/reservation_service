@@ -18,11 +18,7 @@ import {docschedule} from './reservation/schedule.entity';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        host: configService.get<string>('mysql.host'),
-        port: configService.get<number>('mysql.port'),
-        username: configService.get<string>('mysql.username'),
-        password: configService.get<string>('mysql.password'),
-        database: configService.get<string>('mysql.database'),
+        url: configService.get<string>('mysql.url'),
         entities: [Reservation, docschedule],
         synchronize: true,
       }),
