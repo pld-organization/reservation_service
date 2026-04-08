@@ -2,20 +2,32 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReservationModule } from './reservation/reservation.module'; // ✅ now exists
-
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import mysqlConfig from './config/mysql.config';
+import {Reservation} from './reservation/reservation.entity'; 
+import {docschedule} from './reservation/schedule.entity';
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Itachi12',
-      database: 'reservation_db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'], // ✅ must include schedule.entity.ts
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [mysqlConfig],
     }),
-    ReservationModule, // ✅ import your module
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('mysql.host'),
+        port: configService.get<number>('mysql.port'),
+        username: configService.get<string>('mysql.username'),
+        password: configService.get<string>('mysql.password'),
+        database: configService.get<string>('mysql.database'),
+        entities: [Reservation, docschedule],
+        synchronize: true,
+      }),
+    }),
+    ReservationModule,
   ],
 })
 export class AppModule {}
