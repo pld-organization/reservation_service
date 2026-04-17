@@ -22,7 +22,7 @@ export class ReservationController {
   // Create a new reservation (patient books an appointment)
   @Post('create')
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(AuthGuard('jwt'))
+  
   async createReservation(
     @Body('doctorId') doctorId: string,
     @Body('patientId') patientId: string,
@@ -43,7 +43,7 @@ export class ReservationController {
   // Create doctor's work schedule/timeline
   @Post('create-schedule')
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(AuthGuard('jwt'))
+  
   async createWorkTimeline(
     @Body('doctorId') doctorId: string,
     @Body('dayOfWeek') dayOfWeek: DAY,
@@ -63,7 +63,7 @@ export class ReservationController {
   // Get all reservations for a specific doctor
   @Get('doctor/:doctorId')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard('jwt'))
+  
   async getReservationsByDoctor(
     @Param('doctorId', ParseUUIDPipe) doctorId: string,
   ) {
@@ -73,7 +73,7 @@ export class ReservationController {
   // Get all reservations for a specific patient
   @Get('patient/:patientId')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard('jwt'))
+  
   async getReservationsByPatient(
     @Param('patientId', ParseUUIDPipe) patientId: string,
   ) {
@@ -83,7 +83,7 @@ export class ReservationController {
   // Get available time slots for a doctor
   @Get('available/:doctorId')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard('jwt'))
+  
   async getAvailableHours(
     @Param('doctorId', ParseUUIDPipe) doctorId: string,
   ) {
@@ -93,7 +93,7 @@ export class ReservationController {
   // Cancel a reservation
   @Post('cancel/:reservationId')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard('jwt'))
+ 
   async cancelReservation(
     @Param('reservationId', ParseUUIDPipe) reservationId: string,
   ) {
