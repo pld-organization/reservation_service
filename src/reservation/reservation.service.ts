@@ -54,8 +54,8 @@ export class ReservationService {
   async create_work_timeline(data:{
   doctorId: string;
   dayOfWeek: DAY;
-  startTime: string;
-  endTime: string;
+  starttime: string;
+  endtime: string;
   appointmenttype: TYPE;
   }): Promise<docschedule>{
 
