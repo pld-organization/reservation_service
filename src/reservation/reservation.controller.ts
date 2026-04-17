@@ -47,15 +47,15 @@ export class ReservationController {
   async createWorkTimeline(
     @Body('doctorId') doctorId: string,
     @Body('dayOfWeek') dayOfWeek: DAY,
-    @Body('starttime') starttime: string,
-    @Body('endtime') endtime: string,
+    @Body('startTime') startTime: string,
+    @Body('endTime') endTime: string,
     @Body('appointmenttype') appointmenttype: TYPE,
   ) {
     return this.reservationService.create_work_timeline({
       doctorId,
       dayOfWeek,
-      starttime,
-      endtime,
+      startTime,
+      endTime,
       appointmenttype,
     });
   }
