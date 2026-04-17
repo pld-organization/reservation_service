@@ -1,33 +1,31 @@
 // app.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReservationModule } from './reservation/reservation.module';
+import { ReservationModule } from './reservation/reservation.module'; // ✅ now exists
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import registerAs from './config/mysql.config';
-import { Reservation } from './reservation/reservation.entity';
-import { docschedule } from './reservation/schedule.entity';
-
+import {Reservation} from './reservation/reservation.entity'; 
+import {docschedule} from './reservation/schedule.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [registerAs],
-      envFilePath: '.env',
     }),
+
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const url = configService.get<string>('mysql.url');
-        console.log('DB URL:', url);
-        if (!url) throw new Error('MYSQL_PUBLIC_URL is not defined!');
-        return {
-          type: 'mysql',
-          url,
-          entities: [Reservation, docschedule],
-          synchronize: true,
-        };
-      },  // 👈 just a comma here, no extra )
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('mysql.host'),
+        port: configService.get<number>('mysql.port'),
+        username: configService.get<string>('mysql.username'),
+        password: configService.get<string>('mysql.password'),
+        database: configService.get<string>('mysql.database'),
+        entities: [Reservation, docschedule],
+        synchronize: true,
+      }),
     }),
     ReservationModule,
   ],
