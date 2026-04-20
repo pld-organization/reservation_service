@@ -24,6 +24,12 @@ export class Reservation {
   @Column({ default: false })
   reservationStatus!: boolean;
 
+  @Column({ nullable: true })
+  meetingUrl!: string;
+
+  @Column({ nullable: true })
+  meetingRoomName!: string;
+
   @OneToOne(() => docschedule)
   @JoinColumn()                 
   schedule!: docschedule;
