@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -11,8 +11,23 @@ export class AppController {
   }
 
   @Post('auth/login')  
-  async login(@Body() loginDto: { email: string; password: string }) {
+  async login(@Body() loginDto: { email: string; password: string }) {  
 
-    return { message: 'Login endpoint', ...loginDto };
+    if (loginDto.email === 'Sara.Mansouri@test.com' && loginDto.password === 'password123') {
+      return {
+        success: true,
+        message: 'Connexion réussie',
+        token: 'fake-jwt-token',
+        user: {
+          email: loginDto.email,
+          name: 'Sara Mansouri'
+        }
+      };
+    }
+    
+    return {
+      success: false,
+      message: 'Email ou mot de passe incorrect'
+    };
   }
 }
