@@ -13,7 +13,7 @@ export class AppController {
   @Post('auth/login')  
   async login(@Body() loginDto: { email: string; password: string }) {  
 
-    if (loginDto.email === 'Sara.Mansouri@test.com' && loginDto.password === 'password123') {
+    if (loginDto.email === 'Sara.Mansouri@test.com' && loginDto.password === '123456789') {
       return {
         success: true,
         message: 'Connexion réussie',
