@@ -100,4 +100,34 @@ export class ReservationController {
     await this.reservationService.cancelReservation(reservationId);
     return { message: 'Reservation cancelled successfully' };
   }
+
+  // Get upcoming meetings for a doctor (within 15 minutes)
+  @Get('upcoming/doctor/:doctorId')
+  @HttpCode(HttpStatus.OK)
+  
+  async getUpcomingMeetingsForDoctor(
+    @Param('doctorId', ParseUUIDPipe) doctorId: string,
+  ) {
+    return this.reservationService.getUpcomingMeetings(doctorId, 'doctor');
+  }
+
+  // Get upcoming meetings for a patient (within 15 minutes)
+  @Get('upcoming/patient/:patientId')
+  @HttpCode(HttpStatus.OK)
+  
+  async getUpcomingMeetingsForPatient(
+    @Param('patientId', ParseUUIDPipe) patientId: string,
+  ) {
+    return this.reservationService.getUpcomingMeetings(patientId, 'patient');
+  }
+
+  // Get a specific reservation with meeting details
+  @Get(':reservationId')
+  @HttpCode(HttpStatus.OK)
+  
+  async getReservation(
+    @Param('reservationId', ParseUUIDPipe) reservationId: string,
+  ) {
+    return this.reservationService.getReservation(reservationId);
+  }
 }
