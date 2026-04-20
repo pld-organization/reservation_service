@@ -1,22 +1,19 @@
 import * as fs from 'fs';
 
-export const mysqlConfig = () => {
-  // En production, utilisez DATABASE_URL (une seule variable)
-  if (process.env.NODE_ENV === 'production') {
-    return {
-      url: process.env.DATABASE_URL,  // ← L'URL complète avec certificat inline
-    };
-  }
+export const mysqlConfig = {
+  host: process.env.MYSQL_HOST,
+  port: parseInt(process.env.MYSQL_PORT || '11965'),
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
   
-  return {
-    host: process.env.MYSQL_HOST,
-    port: parseInt(process.env.MYSQL_PORT || '11965'),
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    ssl: {
-      ca: fs.readFileSync('./ca.pem', 'utf8'),
-      rejectUnauthorized: true,
-    },
-  };
+  ssl: {
+    ca: process.env.NODE_ENV === 'production'
+      ? fs.readFileSync('/etc/secrets/aiven-ca.pem', 'utf8')  // Render path
+      : fs.readFileSync('./ca.pem', 'utf8'),                  // Local path
+    rejectUnauthorized: true,
+  },
 };
+
+// ✅ AJOUTEZ CE CI - export default
+export default registerAs('mysql', () => mysqlConfig);
