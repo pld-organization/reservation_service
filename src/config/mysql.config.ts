@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { registerAs } from '@nestjs/config';
 
 export const mysqlConfig = {
   host: process.env.MYSQL_HOST,
