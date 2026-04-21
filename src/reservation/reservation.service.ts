@@ -52,7 +52,7 @@ export class ReservationService {
     
     // Sauvegarder d'abord pour avoir un ID
     const savedReservation = await this.reservationRepository.save(reservation);
-
+    if (schedule.appointmenttype === TYPE.ONLINE) {
     // Créer la room Daily.co
     try {
       const { url, roomName } = await this.dailyService.createMeetingRoom(
@@ -77,7 +77,7 @@ export class ReservationService {
       await this.reservationRepository.remove(savedReservation);
       throw error;
     }
-
+    }
     return savedReservation;
   }
 
