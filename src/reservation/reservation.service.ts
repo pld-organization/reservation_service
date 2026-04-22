@@ -187,4 +187,32 @@ export class ReservationService {
 
     return meetingDate;
   }
+
+  async getMeetingUrlsByDoctor(doctorId: string): Promise<object[]> {
+    const reservations = await this.reservationRepository.find({
+      where: { doctorId, reservationStatus: true },
+      relations: ['schedule'],
+    });
+
+    return reservations
+      .filter(r => r.meetingUrl)
+      .map(r => ({
+        meetingUrl: r.meetingUrl,
+        startTime: r.schedule?.startTime ?? null,
+      }));
+  }
+
+  async getMeetingUrlsByPatient(patientId: string): Promise<object[]> {
+    const reservations = await this.reservationRepository.find({
+      where: { patientId, reservationStatus: true },
+      relations: ['schedule'],
+    });
+
+    return reservations
+      .filter(r => r.meetingUrl)
+      .map(r => ({
+        meetingUrl: r.meetingUrl,
+        startTime: r.schedule?.startTime ?? null,
+      }));
+  }
 }
