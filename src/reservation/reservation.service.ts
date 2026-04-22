@@ -55,7 +55,7 @@ export class ReservationService {
     if (schedule.appointmenttype === TYPE.ONLINE) {
     // Créer la room Daily.co
     try {
-      const { url, roomName } = await this.dailyService.createMeetingRoom(
+      const { url, roomName } = this.jitsiService.createMeetingRoom(
         data.doctorId,
         data.patientId,
         savedReservation.id,
