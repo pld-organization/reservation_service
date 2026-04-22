@@ -1,11 +1,11 @@
-import { Injectable , BadRequestException ,NotFoundException} from "@nestjs/common";
+import { Injectable, BadRequestException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Reservation } from "./reservation.entity";
 import { docschedule } from "./schedule.entity";
 import { DAY } from "src/common/days.enum";
 import { TYPE } from "src/common/type.enum";
-import { DailyService } from "../services/jitsi.service";
+import { JitsiService } from "../services/jitsi.service";
 
 @Injectable()
 export class ReservationService {
@@ -15,10 +15,8 @@ export class ReservationService {
     @InjectRepository(docschedule)
     private readonly scheduleRepository: Repository<docschedule>,
     private readonly jitsiService: JitsiService,
-  
   ) {}
 
- 
   async createReservation(data: {
     doctorId: string;
     patientId: string;
@@ -27,92 +25,75 @@ export class ReservationService {
     reason: string;
     reservationStatus: boolean;
   }): Promise<Reservation> {
-    const schedule = await this.scheduleRepository.findOne({ 
-      where: { 
-        doctorId: data.doctorId, 
-        dayOfWeek: data.reservationDay,       
-        startTime: data.reservationTime 
-      } 
+    const schedule = await this.scheduleRepository.findOne({
+      where: {
+        doctorId: data.doctorId,
+        dayOfWeek: data.reservationDay,
+        startTime: data.reservationTime,
+      },
     });
-  
+
     if (!schedule) {
       throw new NotFoundException('No schedule slot found for this doctor/day/time');
     }
     if (schedule.status == false) {
       throw new BadRequestException('This time slot is already taken');
     }
-    schedule.status = false; 
+
+    schedule.status = false;
     await this.scheduleRepository.save(schedule);
-  
-    // Créer une réservation temporaire pour obtenir un ID
+
     const reservation = this.reservationRepository.create({
       ...data,
-      schedule: schedule,       
+      schedule: schedule,
     });
-    
-    // Sauvegarder d'abord pour avoir un ID
+
     const savedReservation = await this.reservationRepository.save(reservation);
-    if (schedule.appointmenttype === TYPE.ONLINE) {
-    // Créer la room Daily.co
-    try {
-      const { url, roomName } = this.jitsiService.createMeetingRoom(
-        data.doctorId,
-        data.patientId,
-        savedReservation.id,
-      );
-      
-      // Mettre à jour la réservation avec l'URL de la meeting
-      savedReservation.meetingUrl = url;
-      savedReservation.meetingRoomName = roomName;
-      await this.reservationRepository.save(savedReservation);
-      
-      console.log('[Reservation Service] Meeting created:', {
-        reservationId: savedReservation.id,
-        meetingUrl: url,
-        roomName: roomName,
-      });
-    } catch (error) {
-      console.error('[Reservation Service] Error creating Daily meeting:', error);
-      // Supprimer la réservation si la création de la meeting échoue
-      await this.reservationRepository.remove(savedReservation);
-      throw error;
-    }
-    }
+
+    // Jitsi — pas de await, pas d'appel réseau
+    const { url, roomName } = this.jitsiService.createMeetingRoom(
+      data.doctorId,
+      data.patientId,
+      savedReservation.id,
+    );
+
+    savedReservation.meetingUrl = url;
+    savedReservation.meetingRoomName = roomName;
+    await this.reservationRepository.save(savedReservation);
+
+    console.log('[Jitsi] Meeting created:', {
+      reservationId: savedReservation.id,
+      meetingUrl: url,
+      roomName: roomName,
+    });
+
     return savedReservation;
   }
 
-
-  async create_work_timeline(data:{
-  doctorId: string;
-  dayOfWeek: DAY;
-  startTime: string;
-  endTime: string;
-  appointmenttype: TYPE;
-  }): Promise<docschedule>{
-
+  async create_work_timeline(data: {
+    doctorId: string;
+    dayOfWeek: DAY;
+    startTime: string;
+    endTime: string;
+    appointmenttype: TYPE;
+  }): Promise<docschedule> {
     const schedule = this.scheduleRepository.create({
-    ...data,
-    status: true,
+      ...data,
+      status: true,
     });
-    return this.scheduleRepository.save(schedule); 
+    return this.scheduleRepository.save(schedule);
   }
 
   async getReservationsByDoctor(doctorId: string): Promise<Reservation[]> {
-    return this.reservationRepository.find({ where: { doctorId , reservationStatus: true } });
+    return this.reservationRepository.find({ where: { doctorId, reservationStatus: true } });
   }
 
   async getReservationsByPatient(patientId: string): Promise<Reservation[]> {
-    return this.reservationRepository.find({ where: { patientId , reservationStatus: true} });
+    return this.reservationRepository.find({ where: { patientId, reservationStatus: true } });
   }
-  
-
-  
-
 
   async getAvailableHours(doctorId: string): Promise<docschedule[]> {
-    return this.scheduleRepository.find({
-      where: { doctorId, status: true },
-    });
+    return this.scheduleRepository.find({ where: { doctorId, status: true } });
   }
 
   async cancelReservation(reservationId: string): Promise<void> {
@@ -125,19 +106,13 @@ export class ReservationService {
       throw new NotFoundException('Reservation not found');
     }
 
-    // Supprimer la room Daily.co
+    // Jitsi — rien à supprimer
     if (reservation.meetingRoomName) {
-      try {
-        await this.dailyService.deleteMeetingRoom(reservation.meetingRoomName);
-      } catch (error) {
-        console.error('[Reservation Service] Error deleting Daily room:', error);
-      }
+      this.jitsiService.deleteMeetingRoom(reservation.meetingRoomName);
     }
 
-    // Mettre à jour le statut
     await this.reservationRepository.update(reservationId, { reservationStatus: false });
-    
-    // Rendre le créneau disponible
+
     if (reservation.schedule) {
       await this.scheduleRepository.update(reservation.schedule.id, { status: true });
     }
@@ -147,7 +122,8 @@ export class ReservationService {
     userId: string,
     userType: 'doctor' | 'patient',
   ): Promise<Reservation[]> {
-    const query = this.reservationRepository.createQueryBuilder('reservation')
+    const query = this.reservationRepository
+      .createQueryBuilder('reservation')
       .leftJoinAndSelect('reservation.schedule', 'schedule')
       .where('reservation.reservationStatus = :status', { status: true })
       .andWhere('reservation.meetingUrl IS NOT NULL');
@@ -160,21 +136,17 @@ export class ReservationService {
 
     const reservations = await query.getMany();
 
-    // Filtrer pour les meetings dans les 15 minutes à venir
     const now = new Date();
     const fifteenMinutesFromNow = new Date(now.getTime() + 15 * 60 * 1000);
 
     return reservations.filter((res) => {
       if (!res.schedule) return false;
-      
-      // Combiner le jour et l'heure pour créer une date
       const [hours, minutes] = res.schedule.startTime.split(':');
       const meetingDate = this.getDateForDayAndTime(
         res.schedule.dayOfWeek,
         parseInt(hours),
         parseInt(minutes),
       );
-
       return meetingDate >= now && meetingDate <= fifteenMinutesFromNow;
     });
   }
@@ -192,11 +164,7 @@ export class ReservationService {
     return reservation;
   }
 
-  private getDateForDayAndTime(
-    dayOfWeek: DAY,
-    hours: number,
-    minutes: number,
-  ): Date {
+  private getDateForDayAndTime(dayOfWeek: DAY, hours: number, minutes: number): Date {
     const now = new Date();
     const dayMap = {
       [DAY.MONDAY]: 1,
@@ -211,10 +179,7 @@ export class ReservationService {
     const targetDay = dayMap[dayOfWeek];
     const currentDay = now.getDay();
     let daysToAdd = targetDay - currentDay;
-
-    if (daysToAdd < 0) {
-      daysToAdd += 7;
-    }
+    if (daysToAdd < 0) daysToAdd += 7;
 
     const meetingDate = new Date(now);
     meetingDate.setDate(meetingDate.getDate() + daysToAdd);
@@ -222,5 +187,4 @@ export class ReservationService {
 
     return meetingDate;
   }
-  
-}   
+}
