@@ -4,7 +4,7 @@ import { ReservationService } from './reservation.service';
 import { ReservationController } from './reservation.controller';
 import { Reservation } from './reservation.entity';
 import { docschedule } from './schedule.entity';
-import { DailyService } from '../services/jitsi.service';
+import { JitsiService } from '../services/jitsi.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Reservation, docschedule])],
