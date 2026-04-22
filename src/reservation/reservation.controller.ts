@@ -148,4 +148,8 @@ export class ReservationController {
   ) {
     return this.reservationService.getMeetingUrlsByPatient(patientId);
   }
+  @Get('health')
+  health() {
+    return { status: 'ok' };
+  }
 }
