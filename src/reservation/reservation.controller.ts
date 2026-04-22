@@ -130,4 +130,22 @@ export class ReservationController {
   ) {
     return this.reservationService.getReservation(reservationId);
   }
+
+  // Obtenir les meeting URLs d'un docteur
+  @Get('meetings/doctor/:doctorId')
+  @HttpCode(HttpStatus.OK)
+  async getMeetingUrlsByDoctor(
+    @Param('doctorId', ParseUUIDPipe) doctorId: string,
+  ) {
+    return this.reservationService.getMeetingUrlsByDoctor(doctorId);
+  }
+
+  // Obtenir les meeting URLs d'un patient
+  @Get('meetings/patient/:patientId')
+  @HttpCode(HttpStatus.OK)
+  async getMeetingUrlsByPatient(
+    @Param('patientId', ParseUUIDPipe) patientId: string,
+  ) {
+    return this.reservationService.getMeetingUrlsByPatient(patientId);
+  }
 }
