@@ -14,7 +14,7 @@ export class ReservationService {
     private readonly reservationRepository: Repository<Reservation>,
     @InjectRepository(docschedule)
     private readonly scheduleRepository: Repository<docschedule>,
-    private readonly dailyService: DailyService,
+    private readonly jitsiService: JitsiService,
   
   ) {}
 
