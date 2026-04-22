@@ -5,7 +5,7 @@ import { Reservation } from "./reservation.entity";
 import { docschedule } from "./schedule.entity";
 import { DAY } from "src/common/days.enum";
 import { TYPE } from "src/common/type.enum";
-import { DailyService } from "../services/daily.service";
+import { DailyService } from "../services/jitsi.service";
 
 @Injectable()
 export class ReservationService {
