@@ -1,8 +1,9 @@
-// app.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReservationModule } from './reservation/reservation.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { ReservationModule } from './reservation/reservation.module';
+import { AuthModule } from './auth/auth.module';
 import registerAs from './config/mysql.config';
 import { Reservation } from './reservation/reservation.entity';
 import { docschedule } from './reservation/schedule.entity';
@@ -27,9 +28,11 @@ import { docschedule } from './reservation/schedule.entity';
           entities: [Reservation, docschedule],
           synchronize: true,
         };
-      },  // 👈 just a comma here, no extra )
+      },
     }),
     ReservationModule,
+    AuthModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
