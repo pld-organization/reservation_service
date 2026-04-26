@@ -60,6 +60,11 @@ export class ReservationController {
     });
   }
 
+  @Get('health')
+  health() {
+    return { status: 'ok' };
+  }
+
   // Get all reservations for a specific doctor
   @Get('doctor/:doctorId')
   @HttpCode(HttpStatus.OK)
@@ -147,9 +152,5 @@ export class ReservationController {
     @Param('patientId', ParseUUIDPipe) patientId: string,
   ) {
     return this.reservationService.getMeetingUrlsByPatient(patientId);
-  }
-  @Get('health')
-  health() {
-    return { status: 'ok' };
   }
 }
