@@ -19,7 +19,6 @@ import { TYPE } from 'src/common/type.enum';
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
-  // Create a new reservation (patient books an appointment)
   @Post('create')
   @HttpCode(HttpStatus.CREATED)
   async createReservation(
@@ -39,7 +38,6 @@ export class ReservationController {
     });
   }
 
-  // Create doctor's work schedule/timeline
   @Post('create-schedule')
   @HttpCode(HttpStatus.CREATED)
   async createWorkTimeline(
@@ -58,7 +56,6 @@ export class ReservationController {
     });
   }
 
-  // Get all reservations for a specific doctor
   @Get('doctor/:doctorId')
   @HttpCode(HttpStatus.OK)
   async getReservationsByDoctor(
@@ -67,7 +64,6 @@ export class ReservationController {
     return this.reservationService.getReservationsByDoctor(doctorId);
   }
 
-  // Get all reservations for a specific patient
   @Get('patient/:patientId')
   @HttpCode(HttpStatus.OK)
   async getReservationsByPatient(
@@ -76,7 +72,6 @@ export class ReservationController {
     return this.reservationService.getReservationsByPatient(patientId);
   }
 
-  // Get available time slots for a doctor
   @Get('available/:doctorId')
   @HttpCode(HttpStatus.OK)
   async getAvailableHours(
@@ -85,7 +80,6 @@ export class ReservationController {
     return this.reservationService.getAvailableHours(doctorId);
   }
 
-  // Cancel a reservation
   @Post('cancel/:reservationId')
   @HttpCode(HttpStatus.OK)
   async cancelReservation(
@@ -95,8 +89,10 @@ export class ReservationController {
     return { message: 'Reservation cancelled successfully' };
   }
 
-  // Get upcoming meetings for a doctor (within 15 minutes)
+  // ─── Public endpoints (internal microservice calls, no JWT required) ──────
+
   @Get('upcoming/doctor/:doctorId')
+  @UseGuards()
   @HttpCode(HttpStatus.OK)
   async getUpcomingMeetingsForDoctor(
     @Param('doctorId', ParseUUIDPipe) doctorId: string,
@@ -104,8 +100,8 @@ export class ReservationController {
     return this.reservationService.getUpcomingMeetings(doctorId, 'doctor');
   }
 
-  // Get upcoming meetings for a patient (within 15 minutes)
   @Get('upcoming/patient/:patientId')
+  @UseGuards()
   @HttpCode(HttpStatus.OK)
   async getUpcomingMeetingsForPatient(
     @Param('patientId', ParseUUIDPipe) patientId: string,
@@ -113,7 +109,8 @@ export class ReservationController {
     return this.reservationService.getUpcomingMeetings(patientId, 'patient');
   }
 
-  // Get meeting URLs for a doctor
+  // ─────────────────────────────────────────────────────────────────────────
+
   @Get('meetings/doctor/:doctorId')
   @HttpCode(HttpStatus.OK)
   async getMeetingUrlsByDoctor(
@@ -122,7 +119,6 @@ export class ReservationController {
     return this.reservationService.getMeetingUrlsByDoctor(doctorId);
   }
 
-  // Get meeting URLs for a patient
   @Get('meetings/patient/:patientId')
   @HttpCode(HttpStatus.OK)
   async getMeetingUrlsByPatient(
@@ -131,7 +127,6 @@ export class ReservationController {
     return this.reservationService.getMeetingUrlsByPatient(patientId);
   }
 
-  // Get a specific reservation with meeting details
   @Get(':reservationId')
   @HttpCode(HttpStatus.OK)
   async getReservation(
