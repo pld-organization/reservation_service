@@ -8,18 +8,22 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  SetMetadata,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ReservationService } from './reservation.service';
 import { DAY } from 'src/common/days.enum';
 import { TYPE } from 'src/common/type.enum';
 
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+
 @Controller('reservation')
-@UseGuards(AuthGuard('jwt'))
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
   @Post('create')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   async createReservation(
     @Body('doctorId') doctorId: string,
@@ -39,6 +43,7 @@ export class ReservationController {
   }
 
   @Post('create-schedule')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
   async createWorkTimeline(
     @Body('doctorId') doctorId: string,
@@ -57,6 +62,7 @@ export class ReservationController {
   }
 
   @Get('doctor/:doctorId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async getReservationsByDoctor(
     @Param('doctorId', ParseUUIDPipe) doctorId: string,
@@ -65,6 +71,7 @@ export class ReservationController {
   }
 
   @Get('patient/:patientId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async getReservationsByPatient(
     @Param('patientId', ParseUUIDPipe) patientId: string,
@@ -73,6 +80,7 @@ export class ReservationController {
   }
 
   @Get('available/:doctorId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async getAvailableHours(
     @Param('doctorId', ParseUUIDPipe) doctorId: string,
@@ -81,6 +89,7 @@ export class ReservationController {
   }
 
   @Post('cancel/:reservationId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async cancelReservation(
     @Param('reservationId', ParseUUIDPipe) reservationId: string,
@@ -89,10 +98,10 @@ export class ReservationController {
     return { message: 'Reservation cancelled successfully' };
   }
 
-  // ─── Public endpoints (internal microservice calls, no JWT required) ──────
+  // ─── Public — internal microservice calls, no JWT required ───────────────
 
+  @Public()
   @Get('upcoming/doctor/:doctorId')
-  @UseGuards()
   @HttpCode(HttpStatus.OK)
   async getUpcomingMeetingsForDoctor(
     @Param('doctorId', ParseUUIDPipe) doctorId: string,
@@ -100,8 +109,8 @@ export class ReservationController {
     return this.reservationService.getUpcomingMeetings(doctorId, 'doctor');
   }
 
+  @Public()
   @Get('upcoming/patient/:patientId')
-  @UseGuards()
   @HttpCode(HttpStatus.OK)
   async getUpcomingMeetingsForPatient(
     @Param('patientId', ParseUUIDPipe) patientId: string,
@@ -112,6 +121,7 @@ export class ReservationController {
   // ─────────────────────────────────────────────────────────────────────────
 
   @Get('meetings/doctor/:doctorId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async getMeetingUrlsByDoctor(
     @Param('doctorId', ParseUUIDPipe) doctorId: string,
@@ -120,6 +130,7 @@ export class ReservationController {
   }
 
   @Get('meetings/patient/:patientId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async getMeetingUrlsByPatient(
     @Param('patientId', ParseUUIDPipe) patientId: string,
@@ -128,6 +139,7 @@ export class ReservationController {
   }
 
   @Get(':reservationId')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   async getReservation(
     @Param('reservationId', ParseUUIDPipe) reservationId: string,
